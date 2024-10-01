@@ -1,0 +1,74 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100;400;600&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    background: transparent;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.panel {
+    background: #57dc16;
+    position: relative; /* Allows absolute positioning of children */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 10px;
+    margin-top: 0px;
+    width: 850px;
+    height: 500px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    padding: 20px;
+}
+
+.panel h1 {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    z-index: 99;
+}
+
+.panel .l {
+    position: absolute;
+    top: 70px; /* Just beneath h1 */
+    left: 20px;
+    z-index: 99;
+}
+
+.panel .logo {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    width: 200px;
+    border-radius: 15px;
+    z-index: 99;
+}
+
+.panel .m {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    z-index: 99;
+}
+
+.panel .loader-l {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* Centers the loader in the panel */
+    height: 300px;
+    display: flex;
+    border-radius: 10px;
+    align-items: center;
+    justify-content: right;
+    z-index: 99;
+    margin-left: 200px;
+}

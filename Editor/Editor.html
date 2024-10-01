@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="icon" href="../Visual Lab Ico.ico" type="image/x-icon">
+    <title>VisualLab</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100;400;600&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Unica+One&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            transition: 0.3s ease;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #1a1a1a;
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: stretch;
+            height: 100vh;
+            margin: 0;
+        }
+        .editor-container {
+            display: flex;
+            width: 100%;
+            max-width: 1200px;
+            height: 100%;
+            border: 1px solid #333;
+        }
+        .sidebar {
+            width: 250px;
+            background-color: #222;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            border-right: 1px solid #333;
+        }
+        .sidebar h2 {
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+        .slider-container {
+            margin: 15px 0;
+        }
+        .slider {
+            width: 100%;
+            margin: 10px 0;
+        }
+        .slider-container label {
+            color: #e9e9e9;
+        }
+        button {
+            padding: 10px 15px;
+            margin-top: 10px;
+            border: none;
+            border-radius: 5px;
+            background-color: #28a745;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        #clearAll {
+            background-color: #2fde14;
+            transition: 0.3s ease;
+        }
+        #clearAll:hover {
+            background-color: #2ec41a;
+            transform: scale(1.05);
+        }
+        #downloadBtn {
+            background-color: #2fde14;
+            transition: 0.3s ease;
+        }
+        #downloadBtn:hover {
+            background-color: #2ec41a;
+            transform: scale(1.05);
+        }
+        canvas {
+            display: none; /* Keep hidden unless needed */
+        }
+
+        #logo {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 40px;
+            color: #d3d3d3;
+            font-family: 'Unica One', cursive;
+            font-weight: 800;
+        }
+    </style>
+</head>
+<body>
+
+<div class="editor-container">
+    <div class="sidebar">
+        <h2>Adjustments</h2>
+        <div class="slider-container">
+            <label>Brightness: <span id="brightVal">100</span>%</label>
+            <input type="range" id="brightness" class="slider" min="0" max="200" value="100">
+        </div>
+        <div class="slider-container">
+            <label>Blur: <span id="blurVal">0</span>px</label>
+            <input type="range" id="blur" class="slider" min="0" max="20" value="0">
+        </div>
+        <div class="slider-container">
+            <label>Greyscale: <span id="greyVal">0</span>%</label>
+            <input type="range" id="greyScale" class="slider" min="0" max="100" value="0">
+        </div>
+        <div class="slider-container">
+            <label>Hue: <span id="hueVal">0</span>°</label>
+            <input type="range" id="hue" class="slider" min="-180" max="180" value="0">
+        </div>
+        <div class="slider-container">
+            <label>Saturation: <span id="saturationVal">100</span>%</label>
+            <input type="range" id="saturation" class="slider" min="0" max="200" value="100">
+        </div>
+        <button id="clearAll">Clear All</button>
+        <button id="downloadBtn" style="display: none;">Download Image</button>
+
+        <p id="logo">VisualLab</p>
+    </div>
+
+    
+    <div class="image-holder">
+        <input type="file" id="selectedImage" class="upload-input" accept="image/*" style="display:none;"/>
+        <div class="choose-image" onclick="document.getElementById('selectedImage').click();" style="cursor: pointer;">
+            <p>Choose an Image</p>
+        </div>
+        <img id="image" src="" alt="Selected Image" style="display: none;"/>
+    </div>
+</div>
+
+<canvas id="image-canvas"></canvas>
+
+<script>
+    let selectedImage = document.querySelector('#selectedImage');
+    let image = document.querySelector('#image');
+    let downloadBtn = document.querySelector('#downloadBtn');
+
+    let slider = document.querySelectorAll('.slider');
+    let clearAll = document.querySelector('#clearAll');
+    const canvas = document.querySelector('#image-canvas');
+    const context = canvas.getContext('2d');
+    let File_Name;
+    let Edited = false;
+
+    selectedImage.addEventListener("change", function () {
+        const file = this.files[0];
+
+        if (file) {
+            const reader = new FileReader();
+            File_Name = file.name;
+            image.style.display = "block";
+
+            reader.addEventListener("load", function () {
+                image.setAttribute("src", this.result);
+                image.onload = function () {
+                    // Set canvas size to fit the image in the holder
+                    const canvasAspect = this.width / this.height;
+                    const holderAspect = 800 / 600;
+
+                    if (canvasAspect > holderAspect) {
+                        canvas.width = 800;
+                        canvas.height = 800 / canvasAspect;
+                    } else {
+                        canvas.height = 600;
+                        canvas.width = 600 * canvasAspect;
+                    }
+
+                    // Draw image on canvas
+                    context.drawImage(image, 0, 0, canvas.width, canvas.height);
+                };
+            });
+            reader.readAsDataURL(file);
+            downloadBtn.style.display = "block";
+            Edited = true;
+        }
+    });
+
+    // Slider events
+    slider.forEach(slider => {
+        slider.addEventListener('input', editImage);
+        slider.addEventListener('input', updateValues);
+    });
+
+    function editImage() {
+        let bright = document.querySelector('#brightness');
+        let blur = document.querySelector('#blur');
+        let grey = document.querySelector('#greyScale'); 
+        let hue = document.querySelector('#hue');
+        let saturation = document.querySelector('#saturation');
+
+        let brightVal = bright.value;
+        let greyVal = grey.value;
+        let blurVal = blur.value;
+        let hueVal = hue.value;
+        let satuVal = saturation.value;
+
+        image.style.filter = `grayscale(${greyVal}%) hue-rotate(${hueVal}deg) brightness(${brightVal}%) blur(${blurVal}px) saturate(${satuVal}%)`;
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        context.filter = `grayscale(${greyVal}%) hue-rotate(${hueVal}deg) brightness(${brightVal}%) blur(${blurVal}px) saturate(${satuVal}%)`;
+        context.drawImage(image, 0, 0, canvas.width, canvas.height);
+    }
+
+    function updateValues() {
+        document.querySelector('#brightVal').innerHTML = document.querySelector('#brightness').value;
+        document.querySelector('#blurVal').innerHTML = document.querySelector('#blur').value;
+        document.querySelector('#greyVal').innerHTML = document.querySelector('#greyScale').value;
+        document.querySelector('#hueVal').innerHTML = document.querySelector('#hue').value;
+        document.querySelector('#saturationVal').innerHTML = document.querySelector('#saturation').value;
+    }
+
+    // Download function
+    downloadBtn.addEventListener('click', function () {
+        const jpegUrl = canvas.toDataURL("image/jpeg", 1.0);
+        const link = document.createElement('a');
+        document.body.appendChild(link);
+        link.href = jpegUrl;
+        link.download = `edited-${File_Name}`;
+        link.click();
+        document.body.removeChild(link);
+    });
+
+    // Clear all function
+    clearAll.addEventListener('click', function () {
+        image.setAttribute("src", "");
+        image.style.display = "none";
+        downloadBtn.style.display = "none";
+        selectedImage.value = "";
+    });
+</script>
+
+</body>
+</html>
